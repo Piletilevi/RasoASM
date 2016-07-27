@@ -11,9 +11,8 @@ with open(plp_filename, 'rU') as plp_data_file:
 
 plp_file_type = plp_json_data['info']
 
-print('{0} type: {1}\n'.format(plp_filename, plp_file_type))
-print(json.dumps(plp_json_data, indent=4, sort_keys=False))
-print('\n\n')
+# print('{0} type: {1}\n'.format(plp_filename, plp_file_type))
+# print(json.dumps(plp_json_data, indent=4, sort_keys=False))
 
 oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
@@ -25,23 +24,29 @@ bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['opera
 bills.Print('')
 
 payment_method_total = {'1':0, '2':0, '3':0, '4':0}
+payment_method_name = {'1':'GRYVNIEJI', '2':'-', '3':'DOVANŲ KORTELĖ', '4':'-'}
 for payment in plp_json_data['payments']:
     payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
     for component in payment['components']:
         if (not component['kkm']):
             continue
-        bills.Print('{0}:{1}{2}{3}'.format(
+        if (not component['amount']):
+            component['amount'] = 1
+        bills.Print('{0}:{1}{2}{3}{4}'.format(
             payment['type'],
             ' %s' % component['type'] if component['type'] else '',
             ' %s' % component['name'] if component['name'] else '',
-            ' x %s' % component['amount'] if component['amount'] else ''
+            ' x %s' % component['amount'] if component['amount'] > 1 else '',
+            ' = %.2f' % component['cost'] if component['cost'] else ''
         ))
-        component['amount'] = 1
-        vat_sign = 0 if component['type'] == 'service fee' else 3
+        if component['type'] == 'service fee':
+            vat_sign = 0
+        else:
+            vat_sign = 3
+        # print('{0}, {1}, {2}, {3}'.format(component['name'], component['amount'], component['cost'], vat_sign))
         bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
 bills.FFinish3(
-    'Gift card', payment_method_total['3'], 1,
-    'Cache', payment_method_total['1'], 0,
-    'GRYNIEJI', payment_method_total['1'], 0)
+    payment_method_name['3'], payment_method_total['3'], 1,
+    payment_method_name['1'], payment_method_total['1'], 0)
 bills.Close()

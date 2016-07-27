@@ -1,2 +1,2 @@
-REM ipy fiscal_lt.ipy
+ipy fiscal_lt.ipy
 python update.py

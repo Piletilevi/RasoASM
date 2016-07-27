@@ -29,10 +29,11 @@ files2update = [
     'package.json',
     'fiscal_lt.bat',
 ]
-print( 'l:{0} vs. r:{1}'.format(l_ver, r_ver))
+
 if (l_ver != r_ver):
     for filename in files2update:
         stdout.write('Update %s ...' % filename)
         with open(filename,'w') as package_file:
             package_file.write(repo.file_contents(filename).decoded)
             print(' done.')
+print('Update finished.')
