@@ -24,7 +24,7 @@ bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['opera
 bills.Print('')
 
 payment_method_total = {'1':0, '2':0, '3':0, '4':0}
-payment_method_name = {'1':'GRYVNIEJI', '2':'-', '3':'DOVANŲ KORTELĖ', '4':'-'}
+payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
 for payment in plp_json_data['payments']:
     payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
     for component in payment['components']:
@@ -48,5 +48,6 @@ for payment in plp_json_data['payments']:
 
 bills.FFinish3(
     payment_method_name['3'], payment_method_total['3'], 1,
+    payment_method_name['2'], payment_method_total['2'], 1,
     payment_method_name['1'], payment_method_total['1'], 0)
 bills.Close()

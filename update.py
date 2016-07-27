@@ -36,4 +36,4 @@ if (l_ver != r_ver):
         with open(filename,'w') as package_file:
             package_file.write(repo.file_contents(filename).decoded)
             print(' done.')
-print('Update finished.')
+    print('Update finished.')
