@@ -3,6 +3,7 @@
 import os
 import github3
 import json
+from sys import stdout
 
 language = os.environ['plp_language']
 
@@ -31,5 +32,7 @@ files2update = [
 print( 'l:{0} vs. r:{1}'.format(l_ver, r_ver))
 if (l_ver != r_ver):
     for filename in files2update:
+        stdout.write('Update %s ...' % filename)
         with open(filename,'w') as package_file:
             package_file.write(repo.file_contents(filename).decoded)
+            print(' done.')
