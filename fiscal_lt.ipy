@@ -19,26 +19,25 @@ bills = Activator.CreateInstance(oo)
 bills.Init()
 bills.FCancel()
 bills.FStart(0)
-bills.Print('')
 bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
-bills.Print('')
 
 payment_method_total = {'1':0, '2':0, '3':0, '4':0}
 payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
 for payment in plp_json_data['payments']:
     payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
+    bills.Print('')
+    bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
     for component in payment['components']:
         if (not component['kkm']):
             continue
         if (not component['amount']):
             component['amount'] = 1
-        bills.Print('{0}:{1}{2}{3}{4}'.format(
-            payment['type'],
-            ' %s' % component['type'] if component['type'] else '',
-            ' %s' % component['name'] if component['name'] else '',
-            ' x %s' % component['amount'] if component['amount'] > 1 else '',
-            ' = %.2f' % component['cost'] if component['cost'] else ''
-        ))
+        # bills.Print('  {0}{1}{2}{3}'.format(
+        #     ' %s' % component['type'] if component['type'] else '',
+        #     ' %s' % component['name'] if component['name'] else '',
+        #     ' x %s' % component['amount'] if component['amount'] > 1 else '',
+        #     ' = %.2f' % component['cost'] if component['cost'] else ''
+        # ))
         if component['type'] == 'service fee':
             vat_sign = 0
         else:
