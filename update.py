@@ -20,7 +20,16 @@ def version_info():
 
 l_ver, r_ver = version_info()
 
+files2update = [
+    'update.py',
+    'fiscal_lt.bat',
+    'fiscal_lt.ipy',
+    'fiscal.py',
+    'package.json',
+    'fiscal_lt.bat',
+]
 print( 'l:{0} vs. r:{1}'.format(l_ver, r_ver))
 if (l_ver != r_ver):
-    with open('package.json','w') as package_file:
-        package_file.write(repo.file_contents('package.json').decoded)
+    for filename in files2update:
+        with open(filename,'w') as package_file:
+            package_file.write(repo.file_contents(filename).decoded)
