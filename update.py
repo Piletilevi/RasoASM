@@ -2,19 +2,25 @@
 
 import os
 import github3
+import json
 
 language = os.environ['plp_language']
+
+if ('gh_token' in os.environ):
+    gh = github3.login(token = os.environ['gh_token'])
+
 repo = github3.repository('Piletilevi', 'RasoASM')
-print (repo)
-dir_contents = repo.directory_contents('/')
-print('dir_contents:{0}'.format(dir_contents))
 
-contents = repo.file_contents('update.py')
-print(contents.decoded)
-fo = open('file2.txt','w')
-fo.write(contents.decoded)
-fo.close()
+def version_info():
+    with open('package.json', 'rU') as package_file:
+        local_package = json.load(package_file)
+    contents = repo.file_contents('package.json')
+    remote_package = json.loads(contents.decoded)
+    return (local_package['version'], remote_package['version'])
 
-# print('contents.name:{0}'.format(contents.name))
+l_ver, r_ver = version_info()
 
-exit()
+print( 'l:{0} vs. r:{1}'.format(l_ver, r_ver))
+if (l_ver != r_ver):
+    with open('package.json','w') as package_file:
+        package_file.write(repo.file_contents('package.json').decoded)
