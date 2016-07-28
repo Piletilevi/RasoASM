@@ -27,7 +27,11 @@ print('{0} type: {1}, operation: {2}\n'.format(plp_filename, plp_json_data['info
 oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
 bills.Init()
-bills.FCancel()
+
+if (bills.Param(1015) == 1):
+    bills.FCancel()
+elif (bills.Param(1015) == 2):
+    bills.NFFinish2(1)
 
 if (operation == 'sale'):
     bills.FStart(0)
@@ -66,11 +70,10 @@ if (operation == 'sale'):
         payment_method_name['1'], payment_method_total['1'], 0)
 elif (operation == 'startshift'):
     print('startshift')
-    bills.NFFinish2(1)
     bills.ReportX()
     bills.NFFinish2(1)
 elif (operation == 'endshift'):
-    bills.NFFinish2(1)
+    print('endshift')
     bills.ReportX()
     bills.ReportZ()
     bills.NFFinish2(1)
