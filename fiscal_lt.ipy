@@ -28,10 +28,10 @@ oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
 bills.Init()
 bills.FCancel()
-bills.FStart(0)
-bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
 
 if (operation == 'sale'):
+    bills.FStart(0)
+    bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     payment_method_total = {'1':0, '2':0, '3':0, '4':0}
     payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
     for payment in plp_json_data['payments']:
@@ -65,10 +65,12 @@ if (operation == 'sale'):
         payment_method_name['2'], payment_method_total['2'], 1,
         payment_method_name['1'], payment_method_total['1'], 0)
 elif (operation == 'startshift'):
+    print('startshift')
+    bills.NFFinish2(1)
     bills.ReportX()
-    bills.NFFinish()
-    # bills.NFFinish2(1)
+    bills.NFFinish2(1)
 elif (operation == 'endshift'):
+    bills.NFFinish2(1)
     bills.ReportX()
     bills.ReportZ()
     bills.NFFinish2(1)
