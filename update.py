@@ -31,9 +31,10 @@ files2update = [
 ]
 
 if (l_ver != r_ver):
+    print('RasoASM update required.')
     for filename in files2update:
-        stdout.write('Update %s ...' % filename)
+        stdout.write('RasoASM: update %s ...' % filename)
         with open(filename,'w') as package_file:
             package_file.write(repo.file_contents(filename).decoded)
             print(' done.')
-    print('Update finished.')
+    print('RasoASM update finished.')
