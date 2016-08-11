@@ -16,8 +16,8 @@ def validate_fiscal(plp_json_data):
         raise ValueError('Only "info" == "fiscal" is supported currently')
     if (not 'operation' in plp_json_data):
         raise IndexError('Missing "operation" field in plp file.')
-    if (plp_json_data['operation'] not in ('sale', 'startshift', 'endshift')):
-        raise ValueError('"operation" must be one of "sale", "startshift", "endshift"')
+    if (plp_json_data['operation'] not in ('sale', 'refund', 'startshift', 'endshift')):
+        raise ValueError('"operation" must be one of "sale", "refund", "startshift", "endshift"')
 
 validate_fiscal(plp_json_data)
 
@@ -28,51 +28,48 @@ oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
 bills.Init()
 
-if (bills.Param(1015) == 1):
+if bills.Param(1015) == 1:
     bills.FCancel()
-elif (bills.Param(1015) == 2):
+elif bills.Param(1015) == 2:
     bills.NFFinish2(1)
 
-if (operation == 'sale'):
+if operation in ('sale', 'refund'):
+    if operation == 'sale':
+        COST_SIGN = 1
+    else:
+        COST_SIGN = -1
     bills.FStart(0)
     bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     bills.Print('')
     payment_method_total = {'1':0, '2':0, '3':0, '4':0}
     payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
     for payment in plp_json_data['payments']:
-        payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
-        bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
+        payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost'] * COST_SIGN
+        bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost'] * COST_SIGN))
         for component in payment['components']:
-            if (not 'kkm' in component):
+            if not 'kkm' in component:
                 continue
-            if (not 'amount' in component):
+            if not 'amount' in component:
                 component['amount'] = 1
-            if (not component['kkm']):
+            if not component['kkm']:
                 continue
-            if (component['amount'] != 1): # we dont want to print amounts yet
+            if component['amount'] != 1: # we dont want to print amounts yet
                 component['amount'] = 1
-            # bills.Print('  {0}{1}{2}{3}'.format(
-            #     ' %s' % component['type'] if component['type'] else '',
-            #     ' %s' % component['name'] if component['name'] else '',
-            #     ' x %s' % component['amount'] if component['amount'] > 1 else '',
-            #     ' = %.2f' % component['cost'] if component['cost'] else ''
-            # ))
             if component['type'] == 'service fee':
                 vat_sign = 0
             else:
                 vat_sign = 3
-            # print('{0}, {1}, {2}, {3}'.format(component['name'], component['amount'], component['cost'], vat_sign))
-            bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
+            bills.FOperation(component['name'], component['amount'], component['cost'] * COST_SIGN, vat_sign)
 
     bills.FFinish3(
         payment_method_name['3'], payment_method_total['3'], 1,
         payment_method_name['2'], payment_method_total['2'], 1,
         payment_method_name['1'], payment_method_total['1'], 0)
-elif (operation == 'startshift'):
+elif operation == 'startshift':
     print('startshift')
     bills.ReportX()
     bills.NFFinish2(1)
-elif (operation == 'endshift'):
+elif operation == 'endshift':
     print('endshift')
     bills.ReportX()
     bills.ReportZ()
