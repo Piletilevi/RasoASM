@@ -35,17 +35,16 @@ elif bills.Param(1015) == 2:
 
 if operation in ('sale', 'refund'):
     if operation == 'sale':
-        COST_SIGN = 1
+        bills.FStart(0)
     else:
-        COST_SIGN = -1
-    bills.FStart(0)
+        bills.FStart(1)
     bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     bills.Print('')
     payment_method_total = {'1':0, '2':0, '3':0, '4':0}
     payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
     for payment in plp_json_data['payments']:
-        payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost'] * COST_SIGN
-        bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost'] * COST_SIGN))
+        payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
+        bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
         for component in payment['components']:
             if not 'kkm' in component:
                 continue
@@ -59,7 +58,7 @@ if operation in ('sale', 'refund'):
                 vat_sign = 0
             else:
                 vat_sign = 3
-            bills.FOperation(component['name'], component['amount'], component['cost'] * COST_SIGN, vat_sign)
+            bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
     bills.FFinish3(
         payment_method_name['3'], payment_method_total['3'], 1,
