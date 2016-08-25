@@ -2,9 +2,10 @@
 
 import json
 from System import Type, Activator
-import os
+from os import environ
+from time import sleep
 
-plp_filename = os.environ['plp_filename']
+plp_filename = environ['plp_filename']
 
 with open(plp_filename, 'rU') as plp_data_file:
     plp_json_data = json.load(plp_data_file)
@@ -26,7 +27,8 @@ print('{0} {1} operation from:\n{2}'.format(plp_json_data['info'], operation, pl
 
 oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
-bills.Init()
+while bills.Init() != 0:
+    sleep(0.1)
 
 if bills.Param(1015) == 1:
     bills.FCancel()
