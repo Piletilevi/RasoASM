@@ -43,7 +43,7 @@ if operation in ('sale', 'refund'):
     bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     bills.Print('')
     payment_method_total = {'1':0, '2':0, '3':0, '4':0}
-    payment_method_name = {'1':'GRYVNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
+    payment_method_name = {'1':'GRYNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
     for payment in plp_json_data['payments']:
         payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
         bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
