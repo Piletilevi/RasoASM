@@ -1,2 +1,2 @@
-@ipy fiscal_lt.ipy
+@fiscal_lt.exe
 @echo Receipt printed

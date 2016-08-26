@@ -1,6 +1,11 @@
 # coding: utf-8
+from sys import path
+path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib\json")
+path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib")
+path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM")
 
-import json
+
+from json import load as loadJSON
 from System import Type, Activator
 from os import environ
 from time import sleep
@@ -8,7 +13,7 @@ from time import sleep
 plp_filename = environ['plp_filename']
 
 with open(plp_filename, 'rU') as plp_data_file:
-    plp_json_data = json.load(plp_data_file)
+    plp_json_data = loadJSON(plp_data_file)
 
 def validate_fiscal(plp_json_data):
     if (not 'info' in plp_json_data):
