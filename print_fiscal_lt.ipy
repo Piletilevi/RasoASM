@@ -4,6 +4,16 @@ path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib\json")
 path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib")
 path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM")
 
+import clr
+
+clr.AddReference('IronPython')
+clr.AddReference('IronPython.Modules')
+clr.AddReference('Microsoft.Scripting.Metadata')
+clr.AddReference('Microsoft.Scripting')
+clr.AddReference('Microsoft.Dynamic')
+clr.AddReference('mscorlib')
+clr.AddReference('System')
+clr.AddReference('System.Data')
 
 from json import load as loadJSON
 from System import Type, Activator
