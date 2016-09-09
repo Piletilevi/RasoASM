@@ -1,8 +1,9 @@
 # coding: utf-8
-from sys import path
-path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib\json")
-path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib")
-path.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM")
+
+from sys import path as syspath
+syspath.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib\json")
+syspath.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib")
+syspath.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM")
 
 import clr
 
@@ -16,9 +17,30 @@ clr.AddReference('System')
 clr.AddReference('System.Data')
 
 from json import load as loadJSON
+from os import environ, path
+from sys import argv, exit
 from System import Type, Activator
-from os import environ
 from time import sleep
+
+
+BASEDIR = path.realpath(path.dirname(argv[0]))
+PACKAGE_FILE_NAME = path.join(BASEDIR, 'package.json')
+with open(PACKAGE_FILE_NAME, 'r') as package_json_file:
+    PACKAGE_JSON = loadJSON(package_json_file)
+
+print '{0} {1}'.format(PACKAGE_JSON['name'], PACKAGE_JSON['version'])
+
+try:
+    plp_filename = environ['plp_filename']
+except Exception as e:
+    print 'PLP filename not in environment.'
+    try:
+        plp_filename = argv[1]
+    except Exception as e:
+        print 'PLP filename not in arguments, neither. Bye.'
+        exit(0)
+
+
 
 plp_filename = environ['plp_filename']
 
