@@ -6,7 +6,6 @@ syspath.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib")
 syspath.append("C:\Users\PiletiLevi\Documents\GitHub\RasoASM")
 
 import clr
-
 clr.AddReference('IronPython')
 clr.AddReference('IronPython.Modules')
 clr.AddReference('Microsoft.Scripting.Metadata')
@@ -14,7 +13,9 @@ clr.AddReference('Microsoft.Scripting')
 clr.AddReference('Microsoft.Dynamic')
 clr.AddReference('mscorlib')
 clr.AddReference('System')
-clr.AddReference('System.Data')
+clr.AddReference('System.Type')
+clr.AddReference('System.Activator')
+
 
 from json import load as loadJSON
 from os import environ, path
