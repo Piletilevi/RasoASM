@@ -88,3 +88,8 @@ ENV/
 .ropeproject
 devenv.bat
 dist.zip
+
+C++
+VC++
+
+.DS_Store
