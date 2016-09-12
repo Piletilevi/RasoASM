@@ -15,12 +15,14 @@ clr.AddReference('Microsoft.Dynamic')
 clr.AddReference('mscorlib')
 clr.AddReference('System')
 clr.AddReference('System.Data')
+#References to created DLL of python modules
+# clr.AddReference('StdLib')
 
 from json import load as loadJSON
 from os import environ, path
 from sys import argv, exit
 from System import Type, Activator
-from time import sleep
+from time import time, sleep
 
 
 BASEDIR = path.realpath(path.dirname(argv[0]))
@@ -30,28 +32,33 @@ with open(PACKAGE_FILE_NAME, 'r') as package_json_file:
 
 print '{0} {1}'.format(PACKAGE_JSON['name'], PACKAGE_JSON['version'])
 
-try:
+if 'plp_filename' in environ:
     plp_filename = environ['plp_filename']
-except Exception as e:
+else:
     print 'PLP filename not in environment.'
-    try:
+    if len(argv) > 1:
         plp_filename = argv[1]
-    except Exception as e:
+    else:
         print 'PLP filename not in arguments, neither. Bye.'
         exit(0)
-
-
-
-plp_filename = environ['plp_filename']
 
 with open(plp_filename, 'rU') as plp_data_file:
     plp_json_data = loadJSON(plp_data_file)
 
+    # Backward compatible with older plp file specs
+    if ('info' in plp_json_data):
+        plp_json_data['jobType'] = plp_json_data['info']
+        plp_json_data['printer'] = {
+            'type': 'fiscal',
+            'systemName': 'RasoASM'
+        }
+
+
 def validate_fiscal(plp_json_data):
-    if (not 'info' in plp_json_data):
-        raise IndexError('Missing "info" field in plp file.')
-    if (plp_json_data['info'] != 'fiscal'):
-        raise ValueError('Only "info" == "fiscal" is supported currently')
+    if (not 'jobType' in plp_json_data):
+        raise IndexError('Missing "jobType" field in plp file.')
+    if (plp_json_data['printer']['type'] != 'fiscal'):
+        raise ValueError('This driver prints only to fiscal printer RasoASM.')
     if (not 'operation' in plp_json_data):
         raise IndexError('Missing "operation" field in plp file.')
     if (plp_json_data['operation'] not in ('sale', 'refund', 'startshift', 'endshift')):
@@ -64,8 +71,12 @@ print('{0} {1} operation from:\n{2}'.format(plp_json_data['info'], operation, pl
 
 oo = Type.GetTypeFromProgID('POS.SA97')
 bills = Activator.CreateInstance(oo)
+timeout_sec = time() + 15
+resolution_sec = 0.1
 while bills.Init() != 0:
-    sleep(0.1)
+    sleep(resolution_sec)
+    if timeout_sec < time():
+        raise IOError('Failed to initialise session with fiscal printer.')
 
 if bills.Param(1015) == 1:
     bills.FCancel()
