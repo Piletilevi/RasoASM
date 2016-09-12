@@ -23,11 +23,13 @@ PLP (PiletiLevi Print) files are JSON.
 RasoASM only deals with PLP files where `printer.type = "fiscal"` and `printer.systemName = "RasoASM"`
 
 
-## Developing prerequisite
+## Execute
 
-IronPython has to be installed from http://ironpython.net/
-
-## Compile distributable
-
-- ipy pyc.py /main:print_fiscal_lt.ipy /target:exe
-- deploy print_fiscal_lt.exe and print_fiscal_lt.dll
+```
+> ipy print_fiscal_lt.ipy fiscal_json_file.plp
+```
+or
+```
+> set PLP_FILENAME=fiscal_json_file.plp
+> ipy print_fiscal_lt.ipy
+```
