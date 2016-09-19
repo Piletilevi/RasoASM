@@ -115,13 +115,17 @@ if operation in ('sale', 'refund'):
 
     for ix in payment_method_total:
         if payment_method_total[ix] != payment_method_total_validate[ix]:
-            bills.Print('')
-            bills.Print('')
-            bills.Print('!!! CHECKSUM ERROR !!!')
-            bills.Print(' In payment type {0}'.format(ix))
-            bills.Print('Sum of component costs | {0}')
+            for i in range(0, 10):
+                bills.Print('')
+            bills.Print('-------------------------------------------')
+            bills.Print('        !!! FISCAL DATA ERROR !!!')
+            bills.Print('            In payment type {0}'.format(ix))
+            bills.Print('Sum of component costs | {0}'.format(payment_method_total_validate[ix]))
             bills.Print('doesnot match          | !=')
-            bills.Print('sum of payment costs   | {0}')
+            bills.Print('sum of payment costs   | {0}'.format(payment_method_total[ix]))
+            bills.Print('-------------------------------------------')
+            for i in range(0, 10):
+                bills.Print('')
             payment_sum_failed = True
 
     if payment_sum_failed:
