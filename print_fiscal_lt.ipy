@@ -91,11 +91,14 @@ if operation in ('sale', 'refund'):
     bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     bills.Print('')
     payment_method_total = {'1':0, '2':0, '3':0, '4':0}
+    payment_method_total_validate = {'1':0, '2':0, '3':0, '4':0}
+    payment_sum_failed = False
     payment_method_name = {'1':'GRYNIEJI', '2':'KREDITINĖ KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
     for payment in plp_json_data['payments']:
-        payment_method_total[payment['type']] = payment_method_total[payment['type']] + payment['cost']
+        payment_method_total[payment['type']] += payment['cost']
         bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
         for component in payment['components']:
+            payment_method_total_validate[payment['type']] += component['cost']
             if not 'kkm' in component:
                 continue
             if not 'amount' in component:
@@ -110,10 +113,26 @@ if operation in ('sale', 'refund'):
                 vat_sign = 3
             bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
-    bills.FFinish3(
-        payment_method_name['3'], payment_method_total['3'], 1,
-        payment_method_name['2'], payment_method_total['2'], 1,
-        payment_method_name['1'], payment_method_total['1'], 0)
+    for ix in payment_method_total:
+        if payment_method_total[ix] != payment_method_total_validate[ix]:
+            bills.Print('')
+            bills.Print('')
+            bills.Print('!!! CHECKSUM ERROR !!!')
+            bills.Print(' In payment type {0}'.format(ix))
+            bills.Print('Sum of component costs | {0}')
+            bills.Print('doesnot match          | !=')
+            bills.Print('sum of payment costs   | {0}')
+            payment_sum_failed = True
+
+    if payment_sum_failed:
+        bills.FCancel()
+        bills.Close()
+    else:
+        bills.FFinish3(
+            payment_method_name['3'], payment_method_total['3'], 1,
+            payment_method_name['2'], payment_method_total['2'], 1,
+            payment_method_name['1'], payment_method_total['1'], 0)
+
 elif operation == 'startshift':
     print('startshift')
     bills.ReportX()
