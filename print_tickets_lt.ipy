@@ -1,0 +1,144 @@
+# coding: utf-8
+
+from sys import path as syspath
+syspath.append('C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib\json')
+syspath.append('C:\Users\PiletiLevi\Documents\GitHub\RasoASM\Lib')
+syspath.append('C:\Users\PiletiLevi\Documents\GitHub\RasoASM')
+
+import clr
+
+clr.AddReference('IronPython')
+clr.AddReference('IronPython.Modules')
+clr.AddReference('Microsoft.Scripting.Metadata')
+clr.AddReference('Microsoft.Scripting')
+clr.AddReference('Microsoft.Dynamic')
+clr.AddReference('mscorlib')
+clr.AddReference('System')
+clr.AddReference('System.Data')
+#References to created DLL of python modules
+# clr.AddReference('StdLib')
+
+from json import load as loadJSON
+from os import environ, path
+from sys import argv, exit
+from System import Type, Activator
+from time import time, sleep
+
+
+BASEDIR = path.realpath(path.dirname(argv[0]))
+PACKAGE_FILE_NAME = path.join(BASEDIR, 'package.json')
+with open(PACKAGE_FILE_NAME, 'r') as package_json_file:
+    PACKAGE_JSON = loadJSON(package_json_file)
+
+print '{0} {1}'.format(PACKAGE_JSON['name'], PACKAGE_JSON['version'])
+
+if 'plp_filename' in environ:
+    plp_filename = environ['plp_filename']
+else:
+    print 'PLP filename not in environment.'
+    if len(argv) > 1:
+        plp_filename = argv[1]
+    else:
+        print 'PLP filename not in arguments, neither. Bye.'
+        exit(0)
+
+with open(plp_filename, 'rU') as plp_data_file:
+    plp_json_data = loadJSON(plp_data_file)
+
+    # Backward compatible with older plp file specs
+    if ('info' in plp_json_data):
+        plp_json_data['jobType'] = plp_json_data['info']
+        plp_json_data['printer'] = {
+            'type': 'fiscal',
+            'systemName': 'RasoASM'
+        }
+
+
+def validate_fiscal(plp_json_data):
+    # TODO:
+    # Negotiate with project team to create data structure that makes sense
+    #
+    # if (not 'printer' in plp_json_data):
+    #     raise IndexError('Missing "printer" field in plp file.')
+    # if (not 'type' in plp_json_data['printer']):
+    #     raise IndexError('Missing "printer.type" field in plp file.')
+    # if (plp_json_data['printer']['type'] != 'fiscal'):
+    #     raise ValueError('This driver prints only to fiscal printer RasoASM.')
+    #
+    if (not 'info' in plp_json_data):
+        raise IndexError('Missing "info" field in plp file.')
+    if (not 'salesPoint' in plp_json_data):
+        raise IndexError('Missing "salesPoint" field in plp file.')
+    if (not 'jobType' in plp_json_data):
+        raise IndexError('Missing "jobType" field in plp file.')
+    if plp_json_data['info'] == 'fiscal':
+        if not 'operation' in plp_json_data:
+            raise IndexError('Missing "operation" field in plp file.')
+        if plp_json_data['operation'] not in ('sale', 'refund', 'startshift', 'endshift'):
+            raise ValueError('"operation" must be one of "sale", "refund", "startshift", "endshift" in {0}.'.format(PLP_FILENAME))
+
+# validate_fiscal(plp_json_data)
+
+# operation = plp_json_data['operation']
+print('{0} operation from:\n{1}'.format(plp_json_data['info'], plp_filename))
+
+oo = Type.GetTypeFromProgID('POS.SA97')
+bills = Activator.CreateInstance(oo)
+timeout_sec = time() + 15
+resolution_sec = 0.1
+while bills.Init('', 0, 12) != 0:
+    sleep(resolution_sec)
+    if timeout_sec < time():
+        raise IOError('Failed to initialise session with fiscal printer.')
+
+if bills.Param(1015) == 1:
+    bills.FCancel()
+elif bills.Param(1015) == 2:
+    bills.NFFinish2(1)
+
+# bills.Print('info: ' + plp_json_data['info'])
+# bills.Print('printerName: ' + plp_json_data['printerName'])
+# bills.Print('printingDriverVersion: ' + plp_json_data['printingDriverVersion'])
+# bills.Print('ticketPrinterType: ' + plp_json_data['ticketPrinterType'])
+
+bills.SendEsc('1D4800') # 1D48XX for HRI position (00 - none)
+# 1D66XX for font of HRI chars
+#     00 - big
+#     01 - small
+#     02 - minuscule
+# bills.SendEsc('1D6604')
+bills.SendEsc('1D6820') # 1D68XX for barcode height
+bills.SendEsc('1D7702') # 1D77XX for horizontal size
+
+for ticket in plp_json_data['documents']:
+    bills.SendEsc('1D2100')
+    bills.Print('--------')
+    if not 'piletid1' in ticket:
+        bills.Print('ERROR: missing ticket ID.')
+        continue
+    bills.Print('ID: {0}'.format(ticket['piletid1']))
+    if not 'triipid' in ticket:
+        bills.Print('ERROR: missing ticket barcode.')
+        continue
+    # bills.Print('Barcode Code128:{0}'.format(ticket['triipid']))
+    bills.SendEsc('1B6101') # 1D61XX for printing alignment (01 - center)
+    bills.SendEsc('1D6B49127B4230313132333435363738393031323937')
+
+    bills.Print(ticket['lisatext1'])
+    bills.Print('')
+    bills.Print(ticket['toimkoht'])
+    bills.Print(ticket['aeg'])
+    bills.Print(ticket['yritus1'])
+    bills.Print(ticket['yritus1'])
+    bills.Print('')
+    bills.Print(ticket['sektor1'])
+    bills.Print('')
+    bills.SendEsc('1D2111')
+    bills.Print(ticket['piletiliik1'])
+    # bills.Print(ticket['hind'])
+
+    bills.SendEsc('1B6101') # 1D61XX for printing alignment (01 - center)
+    bills.SendEsc('1D6B49127B4230313132333435363738393031323937')
+
+bills.NFFinish2(1)
+bills.Close()
