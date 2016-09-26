@@ -127,7 +127,7 @@ if operation in ('sale', 'refund'):
             bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
     for ix in payment_method_total:
-        if payment_method_total[ix] != payment_method_total_validate[ix]:
+        if round(payment_method_total[ix], 2) != round(payment_method_total_validate[ix], 2):
             for i in range(0, 10):
                 bills.Print('')
             bills.Print('-------------------------------------------')
