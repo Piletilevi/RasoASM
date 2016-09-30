@@ -27,7 +27,7 @@ from System import Type, Activator
 from time import time, sleep
 from codecs import open
 
-ABECELE = 'AĄBCČDEĘĖFGHIĮYJKLMNOPRSŠTUŲŪVZŽ'
+# ABECELE = 'AĄBCČDEĘĖFGHIĮYJKLMNOPRSŠTUŲŪVZŽ'
 
 BASEDIR = path.realpath(path.dirname(argv[0]))
 PACKAGE_FILE_NAME = path.join(BASEDIR, 'package.json')
@@ -103,7 +103,7 @@ for ticket in plp_json_data['documents']:
         continue
     printBarcode(ticket['triipid'])
 
-    setFont('small', 'plain')
+    setFont('normal', 'plain')
     if 'lisatext1' in ticket:   printLine(ticket['lisatext1'])
 
     # printLine('')
@@ -125,7 +125,7 @@ for ticket in plp_json_data['documents']:
     if 'hind' in ticket:        printLine(ticket['hind'])
 
     # printLine('')
-    setFont('small', 'plain')
+    setFont('normal', 'plain')
     if 'extrafee' in ticket: printLine(ticket['extrafee'])
     if 'extrafeekm' in ticket: printLine(ticket['extrafeekm'])
 
@@ -135,14 +135,14 @@ for ticket in plp_json_data['documents']:
         if 'total' in ticket:   printLine('{0} {1}'.format(ticket['totaltext'], ticket['total']))
 
     # printLine('')
-    setFont('small', 'plain')
+    setFont('normal', 'plain')
     if 'lisatext2' in ticket: printLine(ticket['lisatext2'])
     if 'lisatext3' in ticket: printLine(ticket['lisatext3'])
     if 'lisatext4' in ticket: printLine(ticket['lisatext4'])
     if 'lisatext5' in ticket: printLine(ticket['lisatext5'])
 
     # printLine('')
-    printBarcode(ticket['triipid'])
+    # printBarcode(ticket['triipid'])
     setFont('normal', 'bold')
     printLine('ID: {0}'.format(ticket['piletid1']))
     bills.NFFinish2(1)
