@@ -146,9 +146,9 @@ if operation in ('sale', 'refund'):
         bills.Close()
     else:
         bills.FFinish3(
-            payment_method_name['3'], payment_method_total['3'], 1,
-            payment_method_name['2'], payment_method_total['2'], 1,
-            payment_method_name['1'], payment_method_total['1'], 0)
+            payment_method_name['3'], payment_method_total['3'], 2, # 3:'DOVANŲ KORTELĖ' -> 2: 2nd credit counter
+            payment_method_name['2'], payment_method_total['2'], 1, # 2:'KORTELĖ'        -> 1: 1st credit counter
+            payment_method_name['1'], payment_method_total['1'], 0) # 1:'GRYNIEJI'       -> 0: cache payment
 
 elif operation == 'startshift':
     print('startshift')
