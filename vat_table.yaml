@@ -1,0 +1,8 @@
+tickets:
+- name: Bilietai
+  VAT_sign: 3
+service fee:
+- name: Test mokestis BT
+  VAT_sign: 0
+- name: Pardavimo punkto mokestis
+  VAT_sign: 0
