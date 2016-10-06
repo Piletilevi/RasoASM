@@ -23,12 +23,16 @@ from os import environ, path
 from sys import argv, exit
 from System import Type, Activator
 from time import time, sleep
-
+from yaml import load as loadYAML
 
 BASEDIR = path.realpath(path.dirname(argv[0]))
 PACKAGE_FILE_NAME = path.join(BASEDIR, 'package.json')
 with open(PACKAGE_FILE_NAME, 'r') as package_json_file:
     PACKAGE_JSON = loadJSON(package_json_file)
+with open('vat_table_' + environ['plp_language'] + '.yaml', 'r') as vat_table_file:
+    VAT_TABLE = loadYAML(vat_table_file)
+with open('payment_methods_' + environ['plp_language'] + '.yaml', 'r') as payment_methods_file:
+    PAYMENT_METHODS = loadYAML(payment_methods_file)
 
 print '{0} {1}'.format(PACKAGE_JSON['name'], PACKAGE_JSON['version'])
 
@@ -55,16 +59,6 @@ with open(plp_filename, 'rU') as plp_data_file:
 
 
 def validate_fiscal(plp_json_data):
-    # TODO:
-    # Negotiate with project team to create data structure that makes sense
-    #
-    # if (not 'printer' in plp_json_data):
-    #     raise IndexError('Missing "printer" field in plp file.')
-    # if (not 'type' in plp_json_data['printer']):
-    #     raise IndexError('Missing "printer.type" field in plp file.')
-    # if (plp_json_data['printer']['type'] != 'fiscal'):
-    #     raise ValueError('This driver prints only to fiscal printer RasoASM.')
-    #
     if (not 'info' in plp_json_data):
         raise IndexError('Missing "info" field in plp file.')
     if (not 'salesPoint' in plp_json_data):
@@ -75,9 +69,12 @@ def validate_fiscal(plp_json_data):
         if not 'operation' in plp_json_data:
             raise IndexError('Missing "operation" field in plp file.')
         if plp_json_data['operation'] not in ('sale', 'refund', 'startshift', 'endshift'):
-            raise ValueError('"operation" must be one of "sale", "refund", "startshift", "endshift" in {0}.'.format(PLP_FILENAME))
+            raise ValueError('"operation" must be one of "sale", "refund", "startshift", "endshift" in plp file.')
+    else:
+        raise ValueError('"info" must be "fiscal" in plp file.')
 
 validate_fiscal(plp_json_data)
+
 
 operation = plp_json_data['operation']
 print('{0} {1} operation from:\n{2}'.format(plp_json_data['info'], operation, plp_filename))
@@ -96,18 +93,39 @@ if bills.Param(1015) == 1:
 elif bills.Param(1015) == 2:
     bills.NFFinish2(1)
 
-if operation in ('sale', 'refund'):
-    if operation == 'sale':
-        bills.FStart(0)
-    else:
-        bills.FStart(1)
+if operation == 'startshift':
+    print('startshift')
+    bills.ReportX()
+    bills.NFFinish2(1)
+elif operation == 'endshift':
+    print('endshift')
+    bills.ReportX()
+    bills.ReportZ()
+    bills.NFFinish2(1)
+elif operation in ('sale', 'refund'):
+    bills.FStart(0 if operation == 'sale' else 1)
     bills.Print('{0} - {1}'.format(plp_json_data['salesPoint'], plp_json_data['operation']))
     bills.Print('')
-    payment_method_total = {'1':0, '2':0, '3':0, '4':0}
-    payment_method_total_validate = {'1':0, '2':0, '3':0, '4':0}
+
+    # payment_method_total = {'1':0, '2':0, '3':0, '4':0}
+    # payment_method_total_validate = {'1':0, '2':0, '3':0, '4':0}
+    # payment_method_name = {'1':'GRYNIEJI', '2':'KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
+    payment_method_total = {}
+    payment_method_total_validate = {}
+    payment_method_name = {}
+    payment_method_xcounter = {}
+    for pm in PAYMENT_METHODS:
+        payment_method_name[pm['code']] = pm['name']
+        payment_method_total[pm['code']] = 0
+        payment_method_total_validate[pm['code']] = 0
+        payment_method_xcounter[pm['code']] = pm['Xcounter']
+
     payment_sum_failed = False
-    payment_method_name = {'1':'GRYNIEJI', '2':'KORTELĖ', '3':'DOVANŲ KORTELĖ', '4':'-'}
+
     for payment in plp_json_data['payments']:
+        if payment['type'] not in payment_method_total:
+            print payment_method_total
+            raise ValueError('There is no payment type "' + payment['type'] + '" in payment_method_total.')
         payment_method_total[payment['type']] += payment['cost']
         bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
         for component in payment['components']:
@@ -120,10 +138,18 @@ if operation in ('sale', 'refund'):
                 continue
             if component['amount'] != 1: # we dont want to print amounts yet
                 component['amount'] = 1
-            if component['type'] == 'service fee':
-                vat_sign = 0
-            else:
-                vat_sign = 3
+
+            if component['type'] not in VAT_TABLE:
+                raise ValueError('There is no component "' + component['type'] + '" in VAT table.')
+            if component['name'] not in VAT_TABLE[component['type']]:
+                print VAT_TABLE[component['type']]
+                raise ValueError('There is no component named "' + component['name']
+                    + '" under "' + component['type'] + '" in VAT table.')
+            vat_sign = VAT_TABLE[component['type']][component['name']]
+            # if component['type'] == 'service fee':
+            #     vat_sign = 0
+            # else:
+            #     vat_sign = 3
             bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
     for ix in payment_method_total:
@@ -146,18 +172,8 @@ if operation in ('sale', 'refund'):
         bills.Close()
     else:
         bills.FFinish3(
-            payment_method_name['3'], payment_method_total['3'], 2, # 3:'DOVANŲ KORTELĖ' -> 2: 2nd credit counter
-            payment_method_name['2'], payment_method_total['2'], 1, # 2:'KORTELĖ'        -> 1: 1st credit counter
-            payment_method_name['1'], payment_method_total['1'], 0) # 1:'GRYNIEJI'       -> 0: cache payment
-
-elif operation == 'startshift':
-    print('startshift')
-    bills.ReportX()
-    bills.NFFinish2(1)
-elif operation == 'endshift':
-    print('endshift')
-    bills.ReportX()
-    bills.ReportZ()
-    bills.NFFinish2(1)
+            payment_method_name['3'], payment_method_total['3'], payment_method_xcounter['3'], # 3:'DOVANŲ KORTELĖ' -> 2: 2nd credit counter
+            payment_method_name['2'], payment_method_total['2'], payment_method_xcounter['2'], # 2:'KORTELĖ'        -> 1: 1st credit counter
+            payment_method_name['1'], payment_method_total['1'], payment_method_xcounter['1']) # 1:'GRYNIEJI'       -> 0: cache payment
 
 bills.Close()

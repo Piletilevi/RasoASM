@@ -1,8 +1,13 @@
+---
+Note for editor of this file:
+  please make sure
+  you encode this file with
+  Baltic (Windows 1257)
+
 tickets:
-- name: Bilietai
-  VAT_sign: 3
+  Bilietai: 3
 service fee:
-- name: Test mokestis BT
-  VAT_sign: 0
-- name: Pardavimo punkto mokestis
-  VAT_sign: 0
+  Test mokestis BT: 0
+  Pardavimo punkto mokestis: 0
+  Paslaugos mokestis 1.00: 0
+  Zalgirio arenos mokestis: 0
