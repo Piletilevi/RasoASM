@@ -124,7 +124,9 @@ elif operation in ('sale', 'refund'):
 
     for payment in plp_json_data['payments']:
         if payment['type'] not in payment_method_total:
-            print payment_method_total
+            bills.Print('There is no payment type "' + payment['type'] + '" in payment_method_total.')
+            bills.FCancel()
+            bills.Close()
             raise ValueError('There is no payment type "' + payment['type'] + '" in payment_method_total.')
         payment_method_total[payment['type']] += payment['cost']
         bills.Print('{0} = {1}'.format(payment_method_name[payment['type']], '%.2f' % payment['cost']))
@@ -140,16 +142,18 @@ elif operation in ('sale', 'refund'):
                 component['amount'] = 1
 
             if component['type'] not in VAT_TABLE:
+                bills.Print('There is no component "' + component['type'] + '" in VAT table.')
+                bills.FCancel()
+                bills.Close()
                 raise ValueError('There is no component "' + component['type'] + '" in VAT table.')
             if component['name'] not in VAT_TABLE[component['type']]:
-                print VAT_TABLE[component['type']]
+                bills.Print('There is no component named "' + component['name']
+                    + '" under "' + component['type'] + '" in VAT table.')
+                bills.FCancel()
+                bills.Close()
                 raise ValueError('There is no component named "' + component['name']
                     + '" under "' + component['type'] + '" in VAT table.')
             vat_sign = VAT_TABLE[component['type']][component['name']]
-            # if component['type'] == 'service fee':
-            #     vat_sign = 0
-            # else:
-            #     vat_sign = 3
             bills.FOperation(component['name'], component['amount'], component['cost'], vat_sign)
 
     for ix in payment_method_total:
