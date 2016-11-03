@@ -61,15 +61,16 @@ with open(plp_filename, 'rU') as plp_data_file:
 def validate_fiscal(plp_json_data):
     if (not 'info' in plp_json_data):
         raise IndexError('Missing "info" field in plp file.')
-    if (not 'salesPoint' in plp_json_data):
-        raise IndexError('Missing "salesPoint" field in plp file.')
-    if (not 'jobType' in plp_json_data):
-        raise IndexError('Missing "jobType" field in plp file.')
     if plp_json_data['info'] == 'fiscal':
         if not 'operation' in plp_json_data:
             raise IndexError('Missing "operation" field in plp file.')
         if plp_json_data['operation'] not in ('sale', 'refund', 'startshift', 'endshift'):
             raise ValueError('"operation" must be one of "sale", "refund", "startshift", "endshift" in plp file.')
+    if (not 'salesPoint' in plp_json_data):
+        if plp_json_data['operation'] not in ('startshift', 'endshift'):
+            raise IndexError('Missing "salesPoint" field in plp file.')
+    if (not 'jobType' in plp_json_data):
+        raise IndexError('Missing "jobType" field in plp file.')
     else:
         raise ValueError('"info" must be "fiscal" in plp file.')
 
