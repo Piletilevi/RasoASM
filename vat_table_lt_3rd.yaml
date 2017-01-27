@@ -8,8 +8,10 @@ tickets:
   Bilietai: 3
 service fee:
   Pardavimo punkto mokestis: 3
+  Paslaugos mokestis 2.90: 3
   Paslaugos mokestis 0.10: 3
   Paslaugos mokestis 0.20: 3
+  Paslaugos mokestis 0.29: 3
   Paslaugos mokestis 0.30: 3
   Paslaugos mokestis 0.40: 3
   Paslaugos mokestis 0.49: 3
@@ -29,7 +31,11 @@ service fee:
   Paslaugos mokestis 1.45: 3
   Paslaugos mokestis 1.50: 3
   Paslaugos mokestis 2.00: 3
+  Siuntimo mokestis: 3
+  Test mokestis BT: 3
   Compensa mokestis 2: 3
+  LOFTO mokestis: 3
+  Paslaugos mokestis Saulë: 3
   Zalgirio arenos mokestis: 3
   Ðvyturio arenos mokestis: 3
   Ðvyturio arenos mokestis 0.30: 3
@@ -38,6 +44,5 @@ service fee:
   Ðvyturio arenos mokestis 0.72: 3
   Ðvyturio arenos mokestis 0.85: 3
   Ðvyturio arenos mokestis 6.00: 3
-  Þalgirio arenos mokestis: 3
-  Ðvyturio arenos mokestis 6.00: 3
+  Þalgirio arenos klubo mokestis: 3
   Þalgirio arenos mokestis: 3
