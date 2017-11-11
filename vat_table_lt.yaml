@@ -8,8 +8,60 @@ tickets:
   Default: 3
   Bilietai: 3
 service fee:
-  Default: 0
-  Test mokestis BT: 0
-  Pardavimo punkto mokestis: 0
-  Paslaugos mokestis 1.00: 0
-  Zalgirio arenos mokestis: 0
+  Default: 3
+  Pardavimo punkto mokestis: 3
+  Paslaugos mokestis 0.10: 3
+  Paslaugos mokestis 0.20: 3
+  Paslaugos mokestis 0.29: 3
+  Paslaugos mokestis 0.30: 3
+  Paslaugos mokestis 0.35: 3
+  Paslaugos mokestis 0.40: 3
+  Paslaugos mokestis 0.49: 3
+  Paslaugos mokestis 0.50: 3
+  Paslaugos mokestis 0.58: 3
+  Paslaugos mokestis 0.60: 3
+  Paslaugos mokestis 0.61: 3
+  Paslaugos mokestis 0.70: 3
+  Paslaugos mokestis 0.72: 3
+  Paslaugos mokestis 0.75: 3
+  Paslaugos mokestis 0.80: 3
+  Paslaugos mokestis 0.85: 3
+  Paslaugos mokestis 0.87: 3
+  Paslaugos mokestis 0.90: 3
+  Paslaugos mokestis 1.00: 3
+  Paslaugos mokestis 1.10: 3
+  Paslaugos mokestis 1.16: 3
+  Paslaugos mokestis 1.20: 3
+  Paslaugos mokestis 1.28: 3
+  Paslaugos mokestis 1.45: 3
+  Paslaugos mokestis 1.50: 3
+  Paslaugos mokestis 1.67: 3
+  Paslaugos mokestis 1.73: 3
+  Paslaugos mokestis 1.79: 3
+  Paslaugos mokestis 1.85: 3
+  Paslaugos mokestis 2.00: 3
+  Paslaugos mokestis 2.40: 3
+  Paslaugos mokestis 2.90: 3
+  Paslaugos mokestis 3.00: 3
+  Paslaugos mokestis 6.00: 3
+  Pramogø arenos mokestis 1.00: 3
+  Siuntimo mokestis: 3
+  Test mokestis BT: 3
+  Compensa mokestis 2: 3
+  Compensa salës mokestis 1.00: 3
+  Labdaros mokestis: 3
+  Lofto mokestis: 3
+  Paslaugos mokestis Saulë: 3
+  Ðvyturio arenos mokestis: 3
+  Ðvyturio arenos mokestis 0.30: 3
+  Ðvyturio arenos mokestis 0.35: 3
+  Ðvyturio arenos mokestis 0.40: 3
+  Ðvyturio arenos mokestis 0.50: 3
+  Ðvyturio arenos mokestis 0.58: 3
+  Ðvyturio arenos mokestis 0.60: 3
+  Ðvyturio arenos mokestis 0.72: 3
+  Ðvyturio arenos mokestis 0.75: 3
+  Ðvyturio arenos mokestis 0.85: 3
+  Ðvyturio arenos mokestis 6.00: 3
+  Þalgirio arenos klubo mokestis: 3
+  Þalgirio arenos mokestis: 3
