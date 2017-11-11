@@ -5,8 +5,10 @@ Note for editor of this file:
   Baltic (Windows 1257)
 
 tickets:
+  Default: 3
   Bilietai: 3
 service fee:
+  Default: 0
   Test mokestis BT: 0
   Pardavimo punkto mokestis: 0
   Paslaugos mokestis 1.00: 0

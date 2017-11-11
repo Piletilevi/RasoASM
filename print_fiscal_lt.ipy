@@ -148,16 +148,21 @@ elif operation in ('sale', 'refund'):
                 raise ValueError('There is no component "' + component['type'] + '" in VAT table.')
 
             component['name'] = component['name'].decode('utf8').encode('windows-1257')
-            if component['name'] not in VAT_TABLE[component['type']]:
-                bills.Print('There is no component named "' + component['name']
+
+            if 'Default' not in VAT_TABLE[component['type']]:
+                bills.Print('There is no "Default" component"'
                     + '" under "' + component['type'] + '" in VAT table.')
                 bills.FCancel()
                 bills.Close()
                 print component['name'], component['name']
                 print VAT_TABLE[component['type']]
-                raise ValueError('There is no component named "' + component['name']
+                raise ValueError('There is no "Default" component"'
                     + '" under "' + component['type'] + '" in VAT table.')
-            vat_sign = VAT_TABLE[component['type']][component['name']]
+
+            vat_sign = VAT_TABLE[component['type']]['Default']
+            if component['name'] in VAT_TABLE[component['type']]:
+                vat_sign = VAT_TABLE[component['type']][component['name']]
+
             bills.FOperation(component['name'].decode('windows-1257'), component['amount'], component['cost'], vat_sign)
 
     for ix in payment_method_total:
